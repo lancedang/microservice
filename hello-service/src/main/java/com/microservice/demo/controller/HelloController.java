@@ -8,7 +8,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.net.URI;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Created by Dangdang on 2018/3/11.
@@ -25,19 +27,14 @@ public class HelloController {
     @RequestMapping(value = "/test", method = RequestMethod.GET)
     public String hello() {
 
+        //与 server 交互 获取以 serviceId 为标志的 service
         List<ServiceInstance> helloInstances = discoveryClient.getInstances("hello-service");
-        List<ServiceInstance> apiInstances = discoveryClient.getInstances("api-gateway");
 
-        System.out.println("helloInstances count = " + helloInstances.size());
-        ServiceInstance helloInstance = helloInstances.get(0);
-        //host=Dangdang.mshome.net, serviceId=HELLO-SERVICE, port=8081, uri=http://Dangdang.mshome.net:8081
-        System.out.println("host=" + helloInstance.getHost() + ", serviceId=" + helloInstance.getServiceId() + ", port=" + helloInstance.getPort() + ", uri=" + helloInstance.getUri());
+        List<URI> uriList = helloInstances.stream().map(item -> item.getUri()).collect(Collectors.toList());
 
-        System.out.println("apiInstances count = " + apiInstances.size());
-        ServiceInstance apiInstance = apiInstances.get(0);
-        System.out.println("host=" + apiInstance.getHost() + ", serviceId=" + apiInstance.getServiceId() + ", port=" + apiInstance.getPort() + ", uri=" + apiInstance.getUri());
+        System.out.println(uriList.toString());
 
-        return "hello";
+        return uriList.toString();
     }
 
 }
